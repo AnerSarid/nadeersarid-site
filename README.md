@@ -80,18 +80,27 @@ public/images/             ← headshot
 
 ## Deploying to Vercel
 
-The site deploys from GitHub through Vercel's Git integration. A push to `main` deploys to production, and every pull request gets a preview URL. These steps need Nadeer's Vercel login.
+Production is the Vercel project **`nadeersarid-site`** in Nadeer's Vercel account. Once GitHub is connected, a push to `main` deploys to production and every pull request gets a preview URL. The domain's DNS is hosted at **Cloudflare**.
 
-1. **Connect GitHub.** In Vercel, go to **Add New… → Project → Import Git Repository**, install the Vercel GitHub app, and give it access to `AnerSarid/nadeersarid-site`. Because the repository is public, commits by Aner deploy on the Hobby plan.
-2. **Import the project.** The framework preset is **Next.js**, the root directory is `./`, and the build command and output stay at their defaults.
-3. **Add the environment variables** from the table above, for Production and Preview, then redeploy.
-4. **Add the domains.** In Project → Settings → Domains, add `nadeersarid.com` and `www.nadeersarid.com`, and connect both to Production with no dashboard redirect. The app redirects www to the apex with a **301** (see `next.config.ts`). If you prefer the dashboard's "Redirect to" option, pick 301 there and confirm with the `curl` check below.
-5. **Add the DNS records** at the registrar (see the next section), or switch the domain to the nameservers Vercel shows you.
-6. **Email forwarding.** Set up `contact@nadeersarid.com` (shown on the site) to forward to Nadeer's inbox. Most registrars offer free forwarding using MX records on the apex.
-7. **Resend.** Add `nadeersarid.com` as a sending domain, add the DNS records it shows, wait for "Verified", and create an API key.
-8. **Cloudflare Turnstile.** In the Cloudflare dashboard, go to Turnstile → Add widget, add hostnames `nadeersarid.com` and `www.nadeersarid.com` (plus the Vercel preview domain if you want the form to work on previews), choose the "Managed" mode, and copy the site key and secret key into Vercel.
-9. **Rate-limit rule (recommended).** In Project → Firewall → Configure → New rule, add: if Request Path equals `/api/contact`, action Rate Limit with a fixed window of 10 minutes, 10 requests, keyed by IP, then Deny. The Hobby plan allows one such rule. The route also has its own in-memory limit, but that is only best effort per serverless instance.
-10. **Move to Vercel Pro** before or soon after launch. Hobby is limited to non-commercial use, and analytics custom events (`whatsapp_click`, `phone_click`, `form_submit`) are recorded only on Pro.
+**Already set up (Nov 22, 2026, via the Vercel CLI):** the project (Next.js preset), `NEXT_PUBLIC_SITE_URL`, `CONTACT_TO_EMAIL` and `CONTACT_FROM_EMAIL` for Production and Preview, and both domains. `www.nadeersarid.com` is a **301** domain redirect to `nadeersarid.com`. `next.config.ts` has the same redirect as a fallback.
+
+**Still to do:**
+
+1. **Connect GitHub.** Nadeer's Vercel account needs a GitHub login connection with access to `AnerSarid/nadeersarid-site` (Vercel → Account Settings → Authentication → Login Connections → GitHub). After that, run `vercel git connect https://github.com/AnerSarid/nadeersarid-site`, or use Project → Settings → Git → Connect. The repository is public, so commits by Aner deploy on the Hobby plan.
+2. **DNS in Cloudflare.** Add the two site records from the table below with the proxy set to **DNS only** (grey cloud). Vercel needs the traffic unproxied to issue the HTTPS certificate. Then run `vercel domains verify nadeersarid.com`.
+3. **Email forwarding.** In Cloudflare → Email → Email Routing, forward `contact@nadeersarid.com` (shown on the site) to Nadeer's inbox. Cloudflare adds its own MX and SPF records.
+4. **Resend.** Add `nadeersarid.com` as a sending domain, add the records it shows in Cloudflare (DNS only), wait for "Verified", and create an API key with "Sending access".
+5. **Cloudflare Turnstile.** In Cloudflare → Turnstile → Add widget, add hostnames `nadeersarid.com` and `www.nadeersarid.com` (plus `nadeersarid-site.vercel.app` if the form should work there) and choose "Managed" mode.
+6. **Secret environment variables.** Add them from a terminal in this folder. Each command prompts for the value, so keys never land in shell history or the repo:
+   ```bash
+   vercel env add RESEND_API_KEY --environment "production,preview" --sensitive
+   vercel env add TURNSTILE_SECRET_KEY --environment "production,preview" --sensitive
+   vercel env add NEXT_PUBLIC_TURNSTILE_SITE_KEY --environment "production,preview" --no-sensitive
+   ```
+   Then redeploy (`vercel deploy --prod`, or push to `main`).
+7. **Rate-limit rule (recommended).** In Project → Firewall → Configure → New rule, add: if Request Path equals `/api/contact`, action Rate Limit with a fixed window of 10 minutes, 10 requests, keyed by IP, then Deny. The Hobby plan allows one such rule. The route also has its own in-memory limit, but that is only best effort per serverless instance.
+8. **Move to Vercel Pro** before or soon after launch. Hobby is limited to non-commercial use, and analytics custom events (`whatsapp_click`, `phone_click`, `form_submit`) are recorded only on Pro.
+9. **Enable 2FA** on Nadeer's Vercel account (Account Settings → Authentication).
 
 ### Launch checks
 
@@ -108,23 +117,22 @@ Then:
 - Run Lighthouse (mobile) and an accessibility scan.
 - Run [Google's Rich Results Test](https://search.google.com/test/rich-results) on the home page.
 
-## DNS records
+## DNS records (Cloudflare)
 
-Add these at the domain's registrar, or in Vercel DNS if you move the nameservers. **Copy the exact values from each dashboard.** Vercel assigns per-project values, so don't reuse values from another project.
+All records are **DNS only** (grey cloud). The Vercel values come from `vercel domains verify <domain>`. For the others, copy the exact values from each service's dashboard.
 
 | Type | Name | Value | For |
 | --- | --- | --- | --- |
-| A | `@` | IP shown in Vercel → Settings → Domains | Site (apex) |
-| CNAME | `www` | Project-specific `….vercel-dns-0xx.com` shown in Vercel | Site (www → 301 to apex) |
+| CNAME | `@` | `c3d60b6b199e49c8.vercel-dns-017.com` | Site (apex; Cloudflare flattens the CNAME) |
+| CNAME | `www` | `c3d60b6b199e49c8.vercel-dns-017.com` | www → 301 to apex |
 | MX | `send` | `feedback-smtp.<region>.amazonses.com` (priority 10), from Resend | Resend bounce handling |
 | TXT | `send` | `v=spf1 include:amazonses.com ~all`, from Resend | Resend SPF |
 | TXT | `resend._domainkey` | DKIM public key, from Resend | Resend DKIM |
 | TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:<Nadeer's inbox>` | DMARC (move to `p=quarantine` once mail is flowing) |
-| MX | `@` | Values from the registrar's email-forwarding setup | `contact@nadeersarid.com` forwarding |
+| MX / TXT | `@` | Added automatically by Cloudflare Email Routing | `contact@nadeersarid.com` forwarding |
 | TXT | `@` | `google-site-verification=…`, from Search Console | Search Console verification |
 
-If the registrar's forwarding adds its own SPF record on `@`, keep it. Resend's SPF lives on the `send` subdomain, so the two don't conflict.
-
+Email Routing's SPF record on `@` and Resend's SPF on `send` don't conflict.
 ## After launch
 
 - **Search Console:** verify the domain with the DNS TXT record above and submit `https://nadeersarid.com/sitemap.xml`.

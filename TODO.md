@@ -4,9 +4,11 @@
 
 ## Blocks launch
 
-- [ ] **Inbox for form submissions.** Set `CONTACT_TO_EMAIL` in Vercel. The PRD default is Nadeer's Gmail, unless she prefers another address.
-- [ ] **Resend and Turnstile keys** in Vercel, with the sending domain verified (see README → Deploying).
-- [ ] **Email forwarding** for `contact@nadeersarid.com`, the public address shown on the site. Or change `publicEmail` in `src/content.ts` to whichever public address she prefers.
+- [x] **Inbox for form submissions.** `CONTACT_TO_EMAIL` is set in Vercel to the PRD default (Nadeer's Gmail). Change it if she prefers another address.
+- [ ] **Connect GitHub to the Vercel project.** Nadeer's Vercel account needs a GitHub login connection with access to the repo (see README → Deploying, step 1).
+- [ ] **DNS at Cloudflare**: the two Vercel CNAME records, DNS only (README → DNS records).
+- [ ] **Resend and Turnstile keys** in Vercel, with the sending domain verified (README → Deploying, steps 4–6).
+- [ ] **Email forwarding** for `contact@nadeersarid.com`, the public address shown on the site, through Cloudflare Email Routing. Or change `publicEmail` in `src/content.ts` to whichever public address she prefers.
 - [ ] **Legal review** of `/privacy` and `/accessibility`. Then set `draft: false` for each in `src/content.ts`.
 - [ ] All placeholders below filled in, or removed with her approval.
 

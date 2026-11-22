@@ -1,0 +1,6 @@
+# Keep local-only files out of CLI deployments.
+.env*
+.claude/
+tasks/
+PRD*.md
+
