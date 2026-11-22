@@ -4,6 +4,7 @@ import { Heebo } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { content } from "@/content";
+import { baseOpenGraph } from "@/lib/seo";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -24,10 +25,8 @@ export const metadata: Metadata = {
   authors: [{ name: content.person.name }],
   alternates: { canonical: "/" },
   openGraph: {
-    type: "website",
-    locale: site.locale,
+    ...baseOpenGraph,
     url: "/",
-    siteName: site.name,
     title: site.title,
     description: site.description,
   },
