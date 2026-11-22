@@ -12,19 +12,19 @@ export function Hero() {
       aria-labelledby="hero-title"
       className="bg-gradient-to-b from-sage-50 to-paper"
     >
-      <div className="mx-auto grid max-w-6xl gap-x-14 gap-y-8 px-5 pb-16 pt-10 sm:px-6 md:grid-cols-[minmax(0,1fr)_minmax(0,360px)] md:pb-24 md:pt-16">
-        <div className="md:col-start-1 md:row-start-1">
+      <div className="mx-auto grid max-w-6xl gap-x-14 gap-y-8 px-5 pb-16 pt-10 sm:px-6 md:pb-24 md:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)]">
+        <div className="lg:col-start-1 lg:row-start-1">
           <h1 id="hero-title" className="text-4xl font-bold text-sage-900 sm:text-5xl">
             {hero.h1}
           </h1>
           <p className="mt-4 text-xl font-medium text-ink-soft sm:text-2xl">{hero.subheading}</p>
         </div>
 
-        <div className="mx-auto w-full max-w-[300px] md:col-start-2 md:row-span-2 md:row-start-1 md:max-w-none md:self-start">
+        <div className="mx-auto w-full max-w-[260px] sm:max-w-[320px] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-w-none lg:self-start">
           <HeroPhoto />
         </div>
 
-        <div className="md:col-start-1 md:row-start-2">
+        <div className="lg:col-start-1 lg:row-start-2">
           <div className="space-y-4">
             {hero.intro.map((p, i) => (
               <p key={i}>{p}</p>

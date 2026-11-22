@@ -7,6 +7,32 @@ import { ShareIcon } from "./ui";
 const { share } = content.ui;
 
 /**
+ * Copies text with the Clipboard API, falling back to a hidden textarea for
+ * in-app browsers (Instagram, Facebook) that block navigator.clipboard.
+ */
+async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const el = document.createElement("textarea");
+    el.value = text;
+    el.setAttribute("readonly", "");
+    el.style.position = "fixed";
+    el.style.opacity = "0";
+    document.body.appendChild(el);
+    el.select();
+    try {
+      return document.execCommand("copy");
+    } catch {
+      return false;
+    } finally {
+      el.remove();
+    }
+  }
+}
+
+/**
  * FR-6: native share sheet on touch devices; elsewhere (or if sharing
  * isn't supported) copy the link and confirm with a toast.
  */
@@ -37,12 +63,7 @@ export function ShareButton({ className = "" }: { className?: string }) {
       }
     }
 
-    try {
-      await navigator.clipboard.writeText(url);
-      showToast(share.copied);
-    } catch {
-      showToast(share.copyFailed);
-    }
+    showToast((await copyText(url)) ? share.copied : share.copyFailed);
   }
 
   return (

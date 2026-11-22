@@ -34,7 +34,7 @@ export function buildJsonLd() {
     {
       "@type": "LocalBusiness",
       "@id": businessId,
-      name: site.title,
+      name: `${person.name} – ${person.credentialsLine}`,
       description: site.description,
       url: siteUrl,
       image: absoluteUrl(person.photo.src),

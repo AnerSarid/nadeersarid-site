@@ -35,7 +35,7 @@ export function HeroPhoto() {
           height={photo.height}
           alt={photo.alt}
           preload
-          sizes="(min-width: 768px) 360px, 80vw"
+          sizes="(min-width: 1024px) 380px, 320px"
           className="aspect-square w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.02]"
         />
         <span className="absolute bottom-3 end-3 inline-flex size-11 items-center justify-center rounded-full bg-white/90 text-sage-900 shadow">

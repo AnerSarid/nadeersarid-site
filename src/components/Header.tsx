@@ -14,14 +14,17 @@ function useActiveSection(enabled: boolean): SectionId | null {
 
   useEffect(() => {
     if (!enabled) return;
-    const sections = nav.items
-      .map((item) => document.getElementById(item.id))
+    // The hero (#top) is observed too, so scrolling back up clears the highlight.
+    const sections = ["top", ...nav.items.map((item) => item.id)]
+      .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) setActive(entry.target.id as SectionId);
+          if (!entry.isIntersecting) continue;
+          const id = entry.target.id as SectionId;
+          setActive(id === "top" ? null : id);
         }
       },
       { rootMargin: "-45% 0px -50% 0px" },

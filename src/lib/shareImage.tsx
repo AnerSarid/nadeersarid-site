@@ -6,6 +6,14 @@ import { content } from "@/content";
 
 export const shareImageSize = { width: 1200, height: 630 };
 
+// Read once at module load (not during the request), so Next can prerender
+// the images at build time instead of running a function per request.
+const [heeboRegular, heeboBold, photo] = await Promise.all([
+  readFile(join(process.cwd(), "src/assets/fonts/Heebo-Regular.ttf")),
+  readFile(join(process.cwd(), "src/assets/fonts/Heebo-Bold.ttf")),
+  readFile(join(process.cwd(), "public", content.person.photo.src)),
+]);
+
 const HEBREW = /[\u0590-\u05FF]/;
 
 /**
@@ -28,8 +36,7 @@ function RtlText({ text, style }: { text: string; style: CSSProperties }) {
 }
 
 /** Favicon / Apple touch icon: the first letter of her name on sage. */
-export async function renderIcon(size: number) {
-  const bold = await readFile(join(process.cwd(), "src/assets/fonts/Heebo-Bold.ttf"));
+export function renderIcon(size: number) {
   return new ImageResponse(
     (
       <div
@@ -52,7 +59,7 @@ export async function renderIcon(size: number) {
         {content.person.firstName.charAt(0)}
       </div>
     ),
-    { width: size, height: size, fonts: [{ name: "Heebo", data: bold, weight: 700, style: "normal" }] },
+    { width: size, height: size, fonts: [{ name: "Heebo", data: heeboBold, weight: 700, style: "normal" }] },
   );
 }
 
@@ -60,12 +67,7 @@ export async function renderIcon(size: number) {
  * The 1200×630 link-preview image (photo, name, title), rendered at build
  * time. This is what WhatsApp shows when the site's link is pasted.
  */
-export async function renderShareImage() {
-  const [regular, bold, photo] = await Promise.all([
-    readFile(join(process.cwd(), "src/assets/fonts/Heebo-Regular.ttf")),
-    readFile(join(process.cwd(), "src/assets/fonts/Heebo-Bold.ttf")),
-    readFile(join(process.cwd(), "public", content.person.photo.src)),
-  ]);
+export function renderShareImage() {
   const photoSrc = `data:image/jpeg;base64,${photo.toString("base64")}`;
   const { name, title, tagline } = content.site.shareImage;
 
@@ -105,8 +107,8 @@ export async function renderShareImage() {
     {
       ...shareImageSize,
       fonts: [
-        { name: "Heebo", data: regular, weight: 400, style: "normal" },
-        { name: "Heebo", data: bold, weight: 700, style: "normal" },
+        { name: "Heebo", data: heeboRegular, weight: 400, style: "normal" },
+        { name: "Heebo", data: heeboBold, weight: 700, style: "normal" },
       ],
     },
   );
