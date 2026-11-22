@@ -277,6 +277,8 @@ export interface SiteContent {
 
 const phoneDisplay = "052-455-8722";
 const publicEmail = "contact@nadeersarid.com";
+// Fill in once; used by the details card, contact section, directions and structured data.
+const clinicAddress = "[להשלמה: כתובת הקליניקה (רחוב ומספר, או שכונה)]";
 
 export const content: SiteContent = {
   site: {
@@ -322,7 +324,7 @@ export const content: SiteContent = {
     email: publicEmail,
     clinic: {
       city: "באר שבע",
-      address: "[להשלמה: כתובת הקליניקה (רחוב ומספר, או שכונה)]",
+      address: clinicAddress,
       where: "קליניקה בבאר שבע · טיפול אונליין",
       convenientFrom: "כל איזור הדרום",
     },
@@ -378,7 +380,7 @@ export const content: SiteContent = {
     heading: "פרטים",
     facts: [
       { label: "איפה", value: "קליניקה בבאר שבע · טיפול אונליין" },
-      { label: "כתובת", value: "[להשלמה: כתובת הקליניקה (רחוב ומספר, או שכונה)]" },
+      { label: "כתובת", value: clinicAddress },
       { label: "נוח להגיע מ", value: "כל איזור הדרום" },
       { label: "שפות", value: "עברית" },
       { label: "גילאים", value: "6–18" },
@@ -461,7 +463,7 @@ export const content: SiteContent = {
       },
       {
         question: "כמה עולה טיפול?",
-        answer: "[להשלמה: תשובה – מחיר פגישה, מחיר \"החל מ\", או הסבר שהמחיר נמסר בשיחה]",
+        answer: "[להשלמה: תשובה – מחיר פגישה, מחיר ״החל מ־״, או הסבר שהמחיר נמסר בשיחה]",
       },
       {
         question: "אפשר לקבל החזר מקופת החולים או מהביטוח?",

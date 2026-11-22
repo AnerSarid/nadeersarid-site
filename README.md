@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# nadeersarid.com
 
-## Getting Started
+The website of Nadeer Sarid (נדיר שריד), a CBT psychotherapist for children and teens aged 6–18 in Beer Sheva and online. It is a one-page Hebrew (RTL) site with a contact form, a privacy policy, an accessibility statement, and a 404 page.
 
-First, run the development server:
+- **Stack:** Next.js 16 (App Router, TypeScript), Tailwind CSS 4, hosted on Vercel.
+- **No database:** contact messages are emailed to Nadeer through Resend and never stored.
+- **Open items:** everything still missing or awaiting approval is listed in [TODO.md](TODO.md).
+
+## Editing content
+
+All text, links and image paths are in **[`src/content.ts`](src/content.ts)**. Components never need to change for a content edit.
+
+- In GitHub, open `src/content.ts`, click the pencil icon, edit the text between the quotes, and commit to a new branch. That opens a pull request with its own preview URL. Merging the pull request publishes it.
+- Text marked `[להשלמה: …]` is a placeholder that still needs real content. It shows on the site highlighted in yellow so it can't go live unnoticed.
+- Testimonials: add items to `reviews.items`, for example `{ text: "…", author: "אורית, באר שבע" }`. The section appears automatically once the list isn't empty. Only publish testimonials if her professional association's ethics rules allow them.
+- **Never** use the word "פסיכולוג" in titles, headings, meta text or alt text. Section 5 of the Psychologists Law forbids it for anyone who isn't a registered psychologist.
+
+Before launch, run:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run check:content
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+It lists every remaining placeholder, fails if "פסיכולוג" appears in a restricted field, and flags legal pages still marked `draft: true`. It is deliberately not part of `npm run build`, so preview deploys keep working while content is being filled in.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Local setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Requires Node.js 20.9 or later (developed on Node 24).
 
-## Learn More
+```bash
+npm install
+cp .env.example .env.local   # then fill in values, see below
+npm run dev                  # http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+Without Resend keys, `npm run dev` still lets you submit the form: the API reports success and logs that no email was sent. For Turnstile in development, use Cloudflare's public test keys (listed in `.env.example`), which always pass.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Script | What it does |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` / `npm start` | Production build / serve it locally |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | Generates route types, then `tsc --noEmit` |
+| `npm run check:content` | Pre-launch content check (see above) |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Environment variables
 
-## Deploy on Vercel
+Set these in Vercel under **Project → Settings → Environment Variables**, for both **Production** and **Preview**. Never commit real values: this repository is public.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Name | Example | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | `https://nadeersarid.com` | Canonical URL for metadata, sitemap and structured data |
+| `RESEND_API_KEY` | `re_…` | Resend API key ("Sending access" is enough) |
+| `CONTACT_TO_EMAIL` | Nadeer's inbox | Where form submissions are delivered |
+| `CONTACT_FROM_EMAIL` | `אתר נדיר שריד <form@nadeersarid.com>` | Sender; must be on the domain verified in Resend |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | `0x4AAA…` | Cloudflare Turnstile site key (public) |
+| `TURNSTILE_SECRET_KEY` | `0x4AAA…` | Cloudflare Turnstile secret key |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+In Preview and Production, the contact route **fails closed** when Resend or Turnstile isn't configured. The form then shows an error with WhatsApp and phone fallbacks instead of silently losing messages.
+
+## Project structure
+
+```
+src/
+  content.ts               ← all site text (edit this)
+  app/
+    layout.tsx             ← <html lang="he" dir="rtl">, font, metadata, header/footer
+    page.tsx               ← one-page home + JSON-LD
+    privacy/ accessibility/ ← legal pages (text in content.ts)
+    not-found.tsx          ← Hebrew 404
+    api/contact/route.ts   ← POST: zod, honeypot, rate limit, Turnstile, Resend
+    opengraph-image.tsx    ← 1200×630 share image (next/og)
+    icon.tsx, apple-icon.tsx, sitemap.ts, robots.ts
+  components/              ← sections and UI
+  lib/                     ← links, analytics, JSON-LD, SEO, email, rate limit, Turnstile
+  assets/fonts/            ← Heebo TTFs for the share image (SIL OFL, see OFL.txt)
+scripts/check-content.mjs  ← pre-launch content check
+public/images/             ← headshot
+```
+
+## Deploying to Vercel
+
+The site deploys from GitHub through Vercel's Git integration. A push to `main` deploys to production, and every pull request gets a preview URL. These steps need Nadeer's Vercel login.
+
+1. **Connect GitHub.** In Vercel, go to **Add New… → Project → Import Git Repository**, install the Vercel GitHub app, and give it access to `AnerSarid/nadeersarid-site`. Because the repository is public, commits by Aner deploy on the Hobby plan.
+2. **Import the project.** The framework preset is **Next.js**, the root directory is `./`, and the build command and output stay at their defaults.
+3. **Add the environment variables** from the table above, for Production and Preview, then redeploy.
+4. **Add the domains.** In Project → Settings → Domains, add `nadeersarid.com` and `www.nadeersarid.com`, and connect both to Production with no dashboard redirect. The app redirects www to the apex with a **301** (see `next.config.ts`). If you prefer the dashboard's "Redirect to" option, pick 301 there and confirm with the `curl` check below.
+5. **Add the DNS records** at the registrar (see the next section), or switch the domain to the nameservers Vercel shows you.
+6. **Email forwarding.** Set up `contact@nadeersarid.com` (shown on the site) to forward to Nadeer's inbox. Most registrars offer free forwarding using MX records on the apex.
+7. **Resend.** Add `nadeersarid.com` as a sending domain, add the DNS records it shows, wait for "Verified", and create an API key.
+8. **Cloudflare Turnstile.** In the Cloudflare dashboard, go to Turnstile → Add widget, add hostnames `nadeersarid.com` and `www.nadeersarid.com` (plus the Vercel preview domain if you want the form to work on previews), choose the "Managed" mode, and copy the site key and secret key into Vercel.
+9. **Rate-limit rule (recommended).** In Project → Firewall → Configure → New rule, add: if Request Path equals `/api/contact`, action Rate Limit with a fixed window of 10 minutes, 10 requests, keyed by IP, then Deny. The Hobby plan allows one such rule. The route also has its own in-memory limit, but that is only best effort per serverless instance.
+10. **Move to Vercel Pro** before or soon after launch. Hobby is limited to non-commercial use, and analytics custom events (`whatsapp_click`, `phone_click`, `form_submit`) are recorded only on Pro.
+
+### Launch checks
+
+```bash
+curl -sI https://www.nadeersarid.com | head -3   # expect 301 → https://nadeersarid.com/
+curl -sI http://nadeersarid.com | head -3        # expect a redirect to https
+npm run check:content                             # expect no placeholders and no drafts
+```
+
+Then:
+- Submit the form end to end and confirm the email arrives (not in spam) within a minute.
+- On a real iPhone and Android phone, check that WhatsApp opens with the greeting and that the phone link dials.
+- Paste the URL into WhatsApp to check the preview card shows the photo, name and title.
+- Run Lighthouse (mobile) and an accessibility scan.
+- Run [Google's Rich Results Test](https://search.google.com/test/rich-results) on the home page.
+
+## DNS records
+
+Add these at the domain's registrar, or in Vercel DNS if you move the nameservers. **Copy the exact values from each dashboard.** Vercel assigns per-project values, so don't reuse values from another project.
+
+| Type | Name | Value | For |
+| --- | --- | --- | --- |
+| A | `@` | IP shown in Vercel → Settings → Domains | Site (apex) |
+| CNAME | `www` | Project-specific `….vercel-dns-0xx.com` shown in Vercel | Site (www → 301 to apex) |
+| MX | `send` | `feedback-smtp.<region>.amazonses.com` (priority 10), from Resend | Resend bounce handling |
+| TXT | `send` | `v=spf1 include:amazonses.com ~all`, from Resend | Resend SPF |
+| TXT | `resend._domainkey` | DKIM public key, from Resend | Resend DKIM |
+| TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:<Nadeer's inbox>` | DMARC (move to `p=quarantine` once mail is flowing) |
+| MX | `@` | Values from the registrar's email-forwarding setup | `contact@nadeersarid.com` forwarding |
+| TXT | `@` | `google-site-verification=…`, from Search Console | Search Console verification |
+
+If the registrar's forwarding adds its own SPF record on `@`, keep it. Resend's SPF lives on the `send` subdomain, so the two don't conflict.
+
+## After launch
+
+- **Search Console:** verify the domain with the DNS TXT record above and submit `https://nadeersarid.com/sitemap.xml`.
+- **Google Business Profile:** create or claim it under her real name and link the site. Locally this matters more than anything on the page.
+- **Update every link:** Instagram and Facebook bios, WhatsApp Business profile, email signature. Ask the directory to link to the new site and to correct her phone number.
+- **Collaboration:** add Nadeer's GitHub account as a collaborator so she can edit `src/content.ts` in GitHub's web editor.
+
+## Notes
+
+- Privacy: the site has no cookies and no embedded third-party widgets except Cloudflare Turnstile on the form. Vercel Web Analytics is cookie-less.
+- Accessibility: built to WCAG 2 AA (the basis of Israeli Standard 5568), with no overlay widget. The statement is at `/accessibility`.
+- Fonts: Heebo (SIL Open Font License 1.1). The page font is self-hosted by `next/font`. The TTFs in `src/assets/fonts` are used only to render the share image.
