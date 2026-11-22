@@ -10,7 +10,7 @@ const ISRAELI_PHONE = /^(?:(?:\+|00)972|0)(?:[23489]\d{7}|[57]\d{8})$/;
 const INTERNATIONAL_PHONE = /^(?:\+|00)[1-9]\d{7,14}$/;
 
 export function normalizePhone(value: string): string {
-  return value.replace(/[\s\-().‎‏]/g, "");
+  return value.replace(/[\s\-().\u200e\u200f]/g, "");
 }
 
 // Error messages are keys of content.contactSection.form.errors.

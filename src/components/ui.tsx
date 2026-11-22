@@ -6,7 +6,7 @@ export function Ltr({ children }: { children: ReactNode }) {
   return <bdi dir="ltr">{children}</bdi>;
 }
 
-const EMOJI = /(\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*️?)/u;
+const EMOJI = /(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*\uFE0F?)/u;
 
 /** Renders text with its emoji hidden from screen readers. */
 export function EmojiText({ text }: { text: string }) {
