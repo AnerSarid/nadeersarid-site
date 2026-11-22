@@ -173,6 +173,8 @@ export interface SiteContent {
     h1: string;
     subheading: string;
     intro: string[];
+    /** Accessible name for the tag chips list. */
+    chipsLabel: string;
     chips: string[];
     whatsappButton: string;
     contactButton: string;
@@ -253,6 +255,8 @@ export interface SiteContent {
   };
   footer: {
     disclaimer: string;
+    /** Accessible name for the footer links. */
+    navLabel: string;
     links: { label: string; href: string }[];
     /** Social profiles. Leave empty to hide the icons. */
     social: SocialLink[];
@@ -364,6 +368,7 @@ export const content: SiteContent = {
       "טיפול קוגניטיבי התנהגותי, שרואה קודם כל את האדם וצרכיו ומתאים אליו כלים שונים, גם מעולמות הסכמה תרפיה והמיינדפולנס. בהתאם לגיל, משולבים כתיבה, יצירה, עבודה בדימיון ומשחק.",
       "אני אוהבת את הגילאים הצעירים ואוהבת לגלות יחד איתם מה מתאים להם ואיך להתגבר על קשייהם. עבדתי לאורך השנים עם נוער שחווה קשיים רגשיים, קשיים במשפחה, בעיות חברתיות וחרדה חברתית, דיכאון, פגיעה עצמית, מחשבות אובדניות, התקפי חרדה וחרדה, OCD ועוד, כמו כן עבדתי שנים רבות עם ילדים ונערים על הספקטרום האוטיסטי.",
     ],
+    chipsLabel: "במבט מהיר",
     chips: ["🌿 CBT", "🧠 ילדים, נוער", "📍 באר שבע · אונליין"],
     whatsappButton: "💬 וואטסאפ ישיר לנדיר",
     contactButton: "פנייה ישירה",
@@ -536,6 +541,7 @@ export const content: SiteContent = {
     // Draft, pending Nadeer's approval (see TODO.md).
     disclaimer:
       "המידע באתר הוא מידע כללי, ואינו מחליף אבחון, ייעוץ או טיפול מקצועי אישי. האתר אינו מיועד למצבי חירום.",
+    navLabel: "מידע משפטי ונגישות",
     links: [
       { label: "מדיניות פרטיות", href: "/privacy" },
       { label: "הצהרת נגישות", href: "/accessibility" },

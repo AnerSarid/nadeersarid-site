@@ -1,26 +1,72 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Palette: warm off-white, sage and sand, one terracotta accent for CTAs.
+   Every text/background pair used on the site meets WCAG AA (4.5:1). */
+@theme {
+  --color-paper: #fbf8f3;
+  --color-sand: #f4ede2;
+  --color-sage-50: #eef2ea;
+  --color-sage-100: #e2eadc;
+  --color-sage-200: #cbd8c3;
+  --color-sage-600: #557257;
+  --color-sage-800: #34503a;
+  --color-sage-900: #243828;
+  --color-ink: #2a2724;
+  --color-ink-soft: #5b554d;
+  --color-accent: #a4492a;
+  --color-accent-dark: #8a3c22;
+  --color-whatsapp: #1d7a45;
+  --color-whatsapp-dark: #17633a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-heebo), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    /* Anchor jumps land below the sticky header (FR-9). */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-size: 1.125rem; /* 18px minimum body text */
+    line-height: 1.7;
+  }
+
+  h1,
+  h2,
+  h3 {
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-accent-dark);
+    outline-offset: 3px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Unfilled "[להשלמה: …]" content: deliberately loud so it can't ship unnoticed. */
+  .placeholder {
+    background-color: #fff3bf;
+    color: #5c3d00;
+    outline: 1px dashed #a16207;
+    border-radius: 0.25rem;
+    padding-inline: 0.25em;
+  }
 }
