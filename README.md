@@ -80,27 +80,26 @@ public/images/             ← headshot
 
 ## Deploying to Vercel
 
-Production is the Vercel project **`nadeersarid-site`** in Nadeer's Vercel account. Once GitHub is connected, a push to `main` deploys to production and every pull request gets a preview URL. The domain's DNS is hosted at **Cloudflare**.
+Production is the Vercel project **`nadeersarid-site`** in Nadeer's Vercel account. A push to `main` deploys to production and every pull request gets a preview URL. The domain's DNS is hosted at **Cloudflare**.
 
-**Already set up (Nov 22, 2026, via the Vercel CLI):** the project (Next.js preset), `NEXT_PUBLIC_SITE_URL`, `CONTACT_TO_EMAIL` and `CONTACT_FROM_EMAIL` for Production and Preview, and both domains. `www.nadeersarid.com` is a **301** domain redirect to `nadeersarid.com`. `next.config.ts` has the same redirect as a fallback.
+**Already set up (Nov 22, 2026, via the Vercel CLI):** the project (Next.js preset), `NEXT_PUBLIC_SITE_URL`, `CONTACT_TO_EMAIL` and `CONTACT_FROM_EMAIL` for Production and Preview, and both domains. GitHub (`AnerSarid/nadeersarid-site`, production branch `main`) was connected on Nov 23, 2026. `www.nadeersarid.com` is a **301** domain redirect to `nadeersarid.com`. `next.config.ts` has the same redirect as a fallback.
 
 **Still to do:**
 
-1. **Connect GitHub.** Nadeer's Vercel account needs a GitHub login connection with access to `AnerSarid/nadeersarid-site` (Vercel → Account Settings → Authentication → Login Connections → GitHub). After that, run `vercel git connect https://github.com/AnerSarid/nadeersarid-site`, or use Project → Settings → Git → Connect. The repository is public, so commits by Aner deploy on the Hobby plan.
-2. **DNS in Cloudflare.** Add the two site records from the table below with the proxy set to **DNS only** (grey cloud). Vercel needs the traffic unproxied to issue the HTTPS certificate. Then run `vercel domains verify nadeersarid.com`.
-3. **Email forwarding.** In Cloudflare → Email → Email Routing, forward `contact@nadeersarid.com` (shown on the site) to Nadeer's inbox. Cloudflare adds its own MX and SPF records.
-4. **Resend.** Add `nadeersarid.com` as a sending domain, add the records it shows in Cloudflare (DNS only), wait for "Verified", and create an API key with "Sending access".
-5. **Cloudflare Turnstile.** In Cloudflare → Turnstile → Add widget, add hostnames `nadeersarid.com` and `www.nadeersarid.com` (plus `nadeersarid-site.vercel.app` if the form should work there) and choose "Managed" mode.
-6. **Secret environment variables.** Add them from a terminal in this folder. Each command prompts for the value, so keys never land in shell history or the repo:
+1. **DNS in Cloudflare.** Add the two site records from the table below with the proxy set to **DNS only** (grey cloud). Vercel needs the traffic unproxied to issue the HTTPS certificate. Then run `vercel domains verify nadeersarid.com`.
+2. **Email forwarding.** In Cloudflare → Email → Email Routing, forward `contact@nadeersarid.com` (shown on the site) to Nadeer's inbox. Cloudflare adds its own MX and SPF records.
+3. **Resend.** Add `nadeersarid.com` as a sending domain, add the records it shows in Cloudflare (DNS only), wait for "Verified", and create an API key with "Sending access".
+4. **Cloudflare Turnstile.** In Cloudflare → Turnstile → Add widget, add hostnames `nadeersarid.com` and `www.nadeersarid.com` (plus `nadeersarid-site.vercel.app` if the form should work there) and choose "Managed" mode.
+5. **Secret environment variables.** Add them from a terminal in this folder. Each command prompts for the value, so keys never land in shell history or the repo:
    ```bash
    vercel env add RESEND_API_KEY --environment "production,preview" --sensitive
    vercel env add TURNSTILE_SECRET_KEY --environment "production,preview" --sensitive
    vercel env add NEXT_PUBLIC_TURNSTILE_SITE_KEY --environment "production,preview" --no-sensitive
    ```
    Then redeploy (`vercel deploy --prod`, or push to `main`).
-7. **Rate-limit rule (recommended).** In Project → Firewall → Configure → New rule, add: if Request Path equals `/api/contact`, action Rate Limit with a fixed window of 10 minutes, 10 requests, keyed by IP, then Deny. The Hobby plan allows one such rule. The route also has its own in-memory limit, but that is only best effort per serverless instance.
-8. **Move to Vercel Pro** before or soon after launch. Hobby is limited to non-commercial use, and analytics custom events (`whatsapp_click`, `phone_click`, `form_submit`) are recorded only on Pro.
-9. **Enable 2FA** on Nadeer's Vercel account (Account Settings → Authentication).
+6. **Rate-limit rule (recommended).** In Project → Firewall → Configure → New rule, add: if Request Path equals `/api/contact`, action Rate Limit with a fixed window of 10 minutes, 10 requests, keyed by IP, then Deny. The Hobby plan allows one such rule. The route also has its own in-memory limit, but that is only best effort per serverless instance.
+7. **Move to Vercel Pro** before or soon after launch. Hobby is limited to non-commercial use, and analytics custom events (`whatsapp_click`, `phone_click`, `form_submit`) are recorded only on Pro.
+8. **Enable 2FA** on Nadeer's Vercel account (Account Settings → Authentication).
 
 ### Launch checks
 
